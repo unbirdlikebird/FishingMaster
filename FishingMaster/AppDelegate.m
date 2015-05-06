@@ -13,6 +13,16 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    self.window = [[UIWindow alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
+    self.window.backgroundColor = [UIColor whiteColor];
+
+    GameVC *gameVC = [[GameVC alloc]initWithNibName:@"GameVC" bundle:nil];
+    UINavigationController *navController = [[UINavigationController alloc]initWithRootViewController:gameVC];
+    self.window.rootViewController = navController;
+
+    [self.window makeKeyAndVisible];
+
+    
     return YES;
 }
 							

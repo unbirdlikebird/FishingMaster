@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Fish.h"
 
 @interface GameVC : UIViewController
 
