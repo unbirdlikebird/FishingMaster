@@ -7,14 +7,17 @@
 //
 
 #import "Fish.h"
+#import "GameVC.h"
+//static int fishCount;
 
 @implementation Fish
 
 //direction 用于表示方向 number用于表示鱼的种类
-- (id)initWithDirection:(NSString *)direction andFishNumber:(int)fishNumber
+- (id)initWithDirection:(NSString *)direction andFishNumber:(int)fishNumber andGameVC:(GameVC *)gameVC
 {
     self = [super init];
     if (self) {
+        _gameVC = gameVC;
         _fishThread = [[NSThread alloc]initWithTarget:self selector:@selector(timerStart) object:nil];
         _fishImagePath = [[NSMutableArray alloc]initWithCapacity:10];
         _direction =[direction lowercaseString];
@@ -34,8 +37,10 @@
 //##############################################################################
 //draw fish
 //##############################################################################
-- (UIImageView *)drawingFish
+- (void)drawingFish
 {
+    [_fishImageView removeFromSuperview];
+
     if ([_direction isEqualToString:@"n"]) {
         [self nfishInit];
     }
@@ -50,9 +55,8 @@
     }
     else{
         NSLog(@"drawingfish error");
-        return 0;
     }
-    return _fishImageView;
+    [_gameVC.view addSubview:_fishImageView];
 }
 //------------------------------------------------------------------------------
 - (void)nfishInit
@@ -96,12 +100,10 @@
     CGRect rect = _fishImageView.frame;
     rect.origin.x = 568 + 50;
     rect.origin.y = arc4random() % 250 + 40;
-
     _fishImageView.frame = rect;
-    NSLog(@"efishInit");
 
     _fishImageView.animationRepeatCount = 0;
-    _fishImageView.animationDuration = _fishNumber / 10;
+    _fishImageView.animationDuration = 1;
     [_fishImageView startAnimating];
 }
 
@@ -110,9 +112,9 @@
 //##############################################################################
 - (void)timerStart
 {
+    [self drawingFish];
     [NSTimer scheduledTimerWithTimeInterval:[self randomSpeed] target:self selector:@selector(moving) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop]run];
-    NSLog(@"[[NSRunLoop currentRunLoop]run]");
 }
 - (void)move
 {
@@ -122,71 +124,112 @@
 //------------------------------------------------------------------------------
 - (NSTimeInterval)randomSpeed
 {
-    return _fishNumber / 10;
-    NSLog(@"randomSpeed = %u", arc4random() % 200 / 1000);
+    NSTimeInterval i = random() % 100 / 50.0 + 1;
+    NSLog(@"randomSpeed = %f", i / 100);
+    return  i / 100;
+
 }
 //------------------------------------------------------------------------------
 - (void)moving
 {
+    float speed = random() % 100 / 100.0 + 1;
+    NSLog(@"speen = %f", speed);
+
     if ([_direction isEqualToString:@"n"]) {
-        [self moving2South];
+        [self moving2SouthWithSpeed:speed];
     }
     else if ([_direction isEqualToString:@"s"]){
-        [self moving2North];
+        [self moving2NorthWithSpeed:speed];
     }
     else if ([_direction isEqualToString:@"w"]){
-        [self moving2East];
+        [self moving2EastWithSpeed:speed];
     }
     else if ([_direction isEqualToString:@"e"]){
-        [self moving2West];
+        [self moving2WestWithSpeed:speed];
     }
     else{
         NSLog(@"fishMoving error");
     }
 }
 //------------------------------------------------------------------------------
-- (void)moving2South
+- (void)moving2SouthWithSpeed:(float)speed
 {
     CGRect rect = _fishImageView.frame;
-    if (rect.origin.y > 320 + 50) {
-        rect.origin.y = 0 - 50;
-        rect.origin.x = arc4random() % 450 + 50;
+    if (rect.origin.y > 320 + 70) {
+        [self changeDirection];
     }
-    rect.origin.y += 0.5;
+    rect.origin.y += speed;
+
     _fishImageView.frame = rect;
 }
 //------------------------------------------------------------------------------
-- (void)moving2North
+- (void)moving2NorthWithSpeed:(float)speed
 {
     CGRect rect = _fishImageView.frame;
-    if (rect.origin.y < 0 - 50) {
-        rect.origin.y = 320 + 50;
-        rect.origin.x = arc4random() % 450 + 50;
+    if (rect.origin.y < 0 - 70) {
+        [self changeDirection];
     }
-    rect.origin.y -= 0.5;
+    rect.origin.y -= speed;
+    
     _fishImageView.frame = rect;
 }
 //------------------------------------------------------------------------------
-- (void)moving2East
+- (void)moving2EastWithSpeed:(float)speed
 {
     CGRect rect = _fishImageView.frame;
-    if (rect.origin.x > 568 + 50) {
-        rect.origin.x  = 0 - 50;
-        rect.origin.y = arc4random() % 250 + 40;
+    if (rect.origin.x > 568 + 70) {
+        [self changeDirection];
     }
-    rect.origin.x += 0.5;
+    rect.origin.x += speed;
     _fishImageView.frame = rect;
 }
 //------------------------------------------------------------------------------
-- (void)moving2West
+- (void)moving2WestWithSpeed:(float)speed
 {
     CGRect rect = _fishImageView.frame;
-    if (rect.origin.x < 0 - 50) {
-        rect.origin.x = 568 + 50;
-        rect.origin.y = arc4random() % 250 + 40;
+    if (rect.origin.x < 0 - 70) {
+        [self changeDirection];
     }
-    rect.origin.x -= 0.5;
+    rect.origin.x -= speed;
     _fishImageView.frame = rect;
+}
+//------------------------------------------------------------------------------
+- (NSString *)randomDirect
+{
+    int i = arc4random() % 3 +1;
+
+    switch (i) {
+        case 1:
+            return @"n";
+            break;
+        case 2:
+            return @"s";
+            break;
+        case 3:
+            return @"w";
+            break;
+        default:
+            return @"e";
+            break;
+    }
+}
+//------------------------------------------------------------------------------
+- (void)changeDirection
+{
+    [NSTimer s]
+    [_fishThread cancel];
+    _direction = [self randomDirect];
+
+    _fishImage = [UIImage imageNamed:[NSString stringWithFormat:@"%@fish%d_0.png", _direction, _fishNumber]];
+    _fishImageView = [[UIImageView alloc]initWithImage:_fishImage];
+    _fishImageView.animationImages = nil;
+    [_fishImagePath removeAllObjects];
+    for (int i = 0 ; i < 10; i++) {
+        [_fishImagePath addObject:[UIImage imageNamed:
+                                   [NSString stringWithFormat:@"%@fish%d_%d.png", _direction, _fishNumber, i]]];
+    }
+    _fishImageView.animationImages = _fishImagePath;
+    [_fishThread start];
 }
 
 @end

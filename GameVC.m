@@ -11,7 +11,7 @@
 @interface GameVC ()
 
 @property   UIImageView     *IV_net;
-
+@property   int             fishCount;
 
 @end
 
@@ -21,9 +21,16 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(refresh) name:@"refresh" object:nil];
+
         // Custom initialization
     }
     return self;
+}
+
+- (void)refresh
+{
+
 }
 
 - (void)viewDidLoad
@@ -48,19 +55,36 @@
 }
 - (void)fish
 {
-    Fish *fish1 = [[Fish alloc]initWithDirection:@"e" andFishNumber:3];
-    [self.view addSubview:[fish1 drawingFish]];
+    Fish *fish1 = [[Fish alloc]initWithDirection:[self randomDirect] andFishNumber:[self randomBreed] andGameVC:self];
     [fish1 move];
-    Fish *fish2 = [[Fish alloc]initWithDirection:@"w" andFishNumber:5];
-    [self.view addSubview:[fish2 drawingFish]];
-    [fish2 move];
-    Fish *fish3 = [[Fish alloc]initWithDirection:@"s" andFishNumber:9];
-    [self.view addSubview:[fish3 drawingFish]];
-    [fish3 move];
-    Fish *fish4 = [[Fish alloc]initWithDirection:@"n" andFishNumber:4];
-    [self.view addSubview:[fish4 drawingFish]];
-    [fish4 move];
+
 }
+
+- (NSString *)randomDirect
+{
+    int i = arc4random() % 3 +1;
+
+    switch (i) {
+        case 1:
+            return @"n";
+            break;
+        case 2:
+            return @"s";
+            break;
+        case 3:
+            return @"w";
+            break;
+        default:
+            return @"e";
+            break;
+    }
+}
+
+- (int)randomBreed
+{
+    return arc4random() % 8 + 1;
+}
+
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
@@ -81,10 +105,20 @@
     NSLog(@"%f,%f", location.x,location.y);
 }
 
+- (void)doubleTap:(UIGestureRecognizer*)gestureRecognizer
+
+{
+
+    [self.view setBackgroundColor:[UIColor blueColor]];
+
+    NSLog(@"-----doubleTap-----");
+    
+}
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
+    NSLog(@"warningngngngngngngngn");
     // Dispose of any resources that can be recreated.
 }
 

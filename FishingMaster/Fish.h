@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+@class GameVC;
 
 @interface Fish : NSObject
 
@@ -16,9 +17,10 @@
 @property   UIImageView         *fishImageView;
 @property   NSThread            *fishThread;
 @property   int                 fishNumber;
+@property   GameVC              *gameVC;
 
-- (id)initWithDirection:(NSString *)direction andFishNumber:(int)fishNumber;
-- (UIImageView *)drawingFish;
+
+- (id)initWithDirection:(NSString *)direction andFishNumber:(int)fishNumber andGameVC:(GameVC *)gameVC;
 - (void)move;
 
 
